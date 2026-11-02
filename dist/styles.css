@@ -1,0 +1,876 @@
+@font-face {
+  font-family: "FC Borish";
+  src: url("./fonts/FC-Borish.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: dark;
+  --ink: #f2f0ff;
+  --muted: rgba(228, 227, 244, 0.76);
+  --hairline: rgba(229, 229, 247, 0.42);
+  --font-display: "FC Borish", Georgia, serif;
+  --font-sans: "Jost", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+
+body {
+  background: #02030a;
+  color: var(--ink);
+  font-family: var(--font-sans);
+}
+
+button { font: inherit; }
+
+.sky {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 36rem;
+  isolation: isolate;
+  overflow: hidden;
+  cursor: crosshair;
+  background:
+    radial-gradient(ellipse at 50% 76%, rgba(85, 87, 128, 0.12), transparent 32%),
+    radial-gradient(ellipse at 50% 22%, rgba(69, 74, 122, 0.08), transparent 32%),
+    linear-gradient(180deg, #02030a 0%, #050611 50%, #02030a 100%);
+}
+
+/* CSS fallback: remains visible even when the browser blocks JavaScript. */
+.sky::before,
+.sky::after {
+  content: "";
+  position: absolute;
+  inset: -12%;
+  z-index: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.sky::before {
+  opacity: .92;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,.95) 0 1px, transparent 1.35px),
+    radial-gradient(circle, rgba(211,221,255,.88) 0 1px, transparent 1.45px),
+    radial-gradient(circle, rgba(255,255,255,.72) 0 .8px, transparent 1.2px),
+    radial-gradient(circle, rgba(183,198,255,.68) 0 .7px, transparent 1.15px),
+    radial-gradient(circle, rgba(255,255,255,.54) 0 .55px, transparent 1px);
+  background-size: 43px 47px, 71px 67px, 97px 89px, 127px 113px, 31px 37px;
+  background-position: 7px 11px, 29px 37px, 53px 13px, 91px 71px, 17px 23px;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 2%, #000 12%, #000 36%, transparent 47%, transparent 56%, #000 65%, #000 96%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 2%, #000 12%, #000 36%, transparent 47%, transparent 56%, #000 65%, #000 96%, transparent 100%);
+  animation: css-star-drift 34s linear infinite, css-star-twinkle 4.5s ease-in-out infinite alternate;
+}
+
+.sky::after {
+  opacity: .8;
+  background-image:
+    radial-gradient(circle, #fff 0 1.5px, rgba(205,214,255,.35) 2px, transparent 5px),
+    radial-gradient(circle, #fff 0 1.2px, rgba(195,207,255,.28) 2px, transparent 4px),
+    radial-gradient(circle, rgba(240,244,255,.9) 0 1px, transparent 2px);
+  background-size: 181px 193px, 263px 229px, 149px 167px;
+  background-position: 31px 17px, 117px 89px, 73px 131px;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 38%, transparent 48%, transparent 58%, #000 68%, #000 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 38%, transparent 48%, transparent 58%, #000 68%, #000 100%);
+  animation: css-star-drift-far 52s linear infinite reverse, css-star-twinkle 3.2s ease-in-out -1s infinite alternate;
+}
+
+#starfield {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.nebula {
+  position: absolute;
+  left: -10%;
+  width: 120%;
+  height: 24%;
+  z-index: 3;
+  pointer-events: none;
+  filter: blur(20px);
+  opacity: 0.42;
+  background:
+    radial-gradient(ellipse at 24% 50%, rgba(137, 144, 185, 0.14), transparent 23%),
+    radial-gradient(ellipse at 51% 52%, rgba(173, 177, 213, 0.18), transparent 24%),
+    radial-gradient(ellipse at 78% 50%, rgba(112, 120, 167, 0.12), transparent 22%);
+  animation: breathe 8s ease-in-out infinite alternate;
+}
+
+.nebula--top { top: 13%; }
+.nebula--bottom { bottom: 8%; transform: scaleY(1.2); animation-delay: -3s; }
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  box-shadow: inset 0 0 16vw 4vw rgba(0, 0, 9, 0.72);
+  background: linear-gradient(90deg, rgba(0,0,8,.28), transparent 20%, transparent 80%, rgba(0,0,8,.28));
+}
+
+.calendar {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(52rem, 80vw);
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 4;
+  text-shadow: 0 0 25px rgba(190, 196, 255, 0.18);
+  animation: arrive 1.6s cubic-bezier(.2,.7,.2,1) both;
+}
+
+.weekday-row { display: flex; align-items: center; justify-content: center; gap: 1.7rem; }
+.weekday-row p { margin: 0; font-size: clamp(.78rem, 1.4vw, 1.18rem); letter-spacing: .55em; padding-left: .55em; font-weight: 600; color: rgba(241, 240, 255, .83); white-space: nowrap; }
+.rule { width: clamp(3rem, 6vw, 6rem); height: 1px; background: linear-gradient(90deg, transparent, var(--hairline)); }
+.rule:last-child { transform: scaleX(-1); }
+
+.date-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: clamp(1.4rem, 5vw, 5.2rem);
+  margin-top: .7rem;
+}
+
+.side-label { margin: 0; font-size: clamp(.8rem, 1.7vw, 1.65rem); letter-spacing: .38em; padding-left: .38em; font-weight: 600; color: rgba(239, 238, 255, .88); white-space: nowrap; }
+.side-label b { font-weight: 600; }
+.day { margin: 0; font-size: clamp(6.3rem, 11vw, 9.7rem); line-height: .91; letter-spacing: -.045em; font-weight: 600; color: #f0efff; text-shadow: 0 0 28px rgba(196, 199, 255, .22); }
+.message { margin: .8rem 0 0; font-style: italic; font-weight: 600; font-size: clamp(.88rem, 1.6vw, 1.45rem); color: var(--muted); letter-spacing: .015em; }
+
+.hint {
+  position: absolute;
+  left: 50%;
+  bottom: 1.65rem;
+  transform: translateX(-50%);
+  margin: 0;
+  font: 500 .62rem/1.3 var(--font-sans);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: rgba(220, 221, 241, .28);
+  transition: opacity .35s ease;
+  white-space: nowrap;
+  z-index: 5;
+}
+.hint-dot { margin: 0 .7rem; }
+
+.sound-toggle {
+  position: absolute;
+  right: 1.5rem;
+  bottom: 1.35rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  border-radius: 50%;
+  border: 1px solid rgba(220, 221, 241, .18);
+  background: rgba(8, 9, 19, .25);
+  color: white;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: border-color .25s, background .25s;
+  z-index: 5;
+}
+.sound-toggle:hover, .sound-toggle:focus-visible { border-color: rgba(220,221,241,.58); background: rgba(24,25,46,.55); outline: none; }
+.sound-toggle span { width: 2px; height: 12px; border-radius: 2px; background: rgba(239,239,255,.7); animation: equalize .9s ease-in-out infinite alternate; }
+.sound-toggle span:nth-child(2) { height: 18px; animation-delay: -.4s; }
+.sound-toggle span:nth-child(3) { height: 8px; animation-delay: -.7s; }
+.sound-toggle[aria-pressed="true"] span { height: 13px; animation: none; }
+.sound-toggle[aria-pressed="true"] span:nth-child(2) { opacity: 0; width: 0; }
+
+@keyframes breathe { from { opacity: .25; transform: translateX(-1.5%) scaleY(1); } to { opacity: .53; transform: translateX(1.5%) scaleY(1.1); } }
+@keyframes arrive { from { opacity: 0; filter: blur(8px); transform: translate(-50%, -46%); } to { opacity: 1; filter: blur(0); transform: translate(-50%, -50%); } }
+@keyframes equalize { from { transform: scaleY(.55); opacity: .45; } to { transform: scaleY(1); opacity: .9; } }
+@keyframes css-star-drift { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(43px, 47px, 0); } }
+@keyframes css-star-drift-far { from { transform: translate3d(-18px, 0, 0); } to { transform: translate3d(92px, 24px, 0); } }
+@keyframes css-star-twinkle { from { opacity: .5; } to { opacity: 1; } }
+
+@media (max-width: 650px) {
+  .sky { min-height: 31rem; }
+  .calendar { width: 92vw; }
+  .weekday-row { gap: .8rem; }
+  .date-row { gap: .65rem; grid-template-columns: 1fr auto 1fr; }
+  .side-label { display: flex; flex-direction: column; gap: .35rem; font-size: .72rem; letter-spacing: .25em; padding-left: .25em; }
+  .day { font-size: clamp(5rem, 27vw, 7.5rem); }
+  .message { margin-top: 1.25rem; padding: 0 2rem; line-height: 1.45; }
+  .hint { left: 1.2rem; transform: none; }
+  .hint-wide, .hint-dot { display: none; }
+  .sound-toggle { right: 1.05rem; bottom: 1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .calendar, .nebula, .sound-toggle span, .sky::before, .sky::after { animation: none; }
+}
+
+/* Dense two-band composition inspired by the supplied reference. */
+.star-sea {
+  position: absolute;
+  left: -4%;
+  width: 108%;
+  height: 37%;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,1) 0 1.35px, transparent 1.8px),
+    radial-gradient(circle, rgba(223,230,255,.98) 0 1px, transparent 1.55px),
+    radial-gradient(circle, rgba(255,255,255,.82) 0 .75px, transparent 1.25px),
+    radial-gradient(circle, rgba(183,197,255,.75) 0 .65px, transparent 1.1px),
+    radial-gradient(circle, rgba(255,255,255,.6) 0 .5px, transparent .95px);
+  background-size: 39px 43px, 57px 53px, 27px 31px, 73px 69px, 19px 23px;
+  background-position: 3px 7px, 29px 17px, 13px 23px, 47px 39px, 5px 11px;
+  filter: drop-shadow(0 0 3px rgba(216,224,255,.55));
+  animation: sea-drift 38s linear infinite, sea-twinkle 3.6s ease-in-out infinite alternate;
+}
+
+.star-sea::before,
+.star-sea::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.star-sea::before {
+  background:
+    radial-gradient(ellipse at 48% 90%, rgba(235,239,255,.42), transparent 27%),
+    radial-gradient(ellipse at 23% 75%, rgba(122,137,196,.18), transparent 22%),
+    radial-gradient(ellipse at 76% 70%, rgba(140,154,211,.2), transparent 23%);
+  filter: blur(9px);
+}
+
+.star-sea::after {
+  background-image:
+    radial-gradient(circle, #fff 0 2px, rgba(205,215,255,.42) 2.5px, transparent 7px),
+    radial-gradient(circle, #fff 0 1.6px, rgba(205,215,255,.35) 2px, transparent 6px);
+  background-size: 211px 193px, 317px 271px;
+  background-position: 41px 27px, 173px 89px;
+  opacity: .85;
+  animation: bright-stars 5s ease-in-out infinite alternate;
+}
+
+.star-sea--top {
+  top: 0;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 58%, rgba(0,0,0,.82) 77%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 58%, rgba(0,0,0,.82) 77%, transparent 100%);
+}
+
+.star-sea--bottom {
+  bottom: 0;
+  transform: scaleY(-1);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 57%, rgba(0,0,0,.8) 77%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 57%, rgba(0,0,0,.8) 77%, transparent 100%);
+  animation-direction: reverse, alternate-reverse;
+}
+
+.light-rays {
+  position: absolute;
+  inset: 15% 0 14%;
+  z-index: 3;
+  opacity: .5;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent 45.7%, rgba(220,226,255,.12) 46.1%, rgba(240,243,255,.32) 46.35%, rgba(188,199,251,.08) 46.75%, transparent 47.2%),
+    linear-gradient(90deg, transparent 37.8%, rgba(203,212,255,.09) 38.1%, rgba(239,242,255,.15) 38.3%, transparent 38.65%),
+    linear-gradient(90deg, transparent 54.8%, rgba(205,215,255,.09) 55.05%, rgba(241,243,255,.18) 55.25%, transparent 55.6%),
+    linear-gradient(90deg, transparent 61.1%, rgba(204,214,255,.08) 61.3%, rgba(239,242,255,.14) 61.45%, transparent 61.75%);
+  filter: blur(3px);
+  animation: rays-breathe 4.5s ease-in-out infinite alternate;
+}
+
+.love-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(64rem, 88vw);
+  z-index: 6;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #f4f3ff;
+  text-shadow: 0 0 26px rgba(202,209,255,.2);
+}
+
+.monogram {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(6rem, 12vw, 11rem);
+  font-style: italic;
+  line-height: .8;
+  letter-spacing: -.15em;
+  padding-right: .15em;
+  color: rgba(246,245,255,.96);
+  transform: rotate(-5deg);
+}
+
+.love-message {
+  margin: clamp(4.2rem, 9vh, 7rem) 0 0;
+  font-size: clamp(.75rem, 1.7vw, 1.55rem);
+  font-style: italic;
+  font-weight: 600;
+  letter-spacing: .32em;
+  padding-left: .32em;
+  white-space: nowrap;
+}
+
+.hearts {
+  margin: clamp(2.5rem, 5vh, 4rem) 0 0;
+  display: flex;
+  justify-content: center;
+  gap: clamp(1.5rem, 3vw, 3rem);
+  color: rgba(244,243,255,.92);
+  font: 1.55rem/1 var(--font-sans);
+}
+
+.hearts span { animation: heart-beat 1.8s ease-in-out infinite; }
+.hearts span:nth-child(2) { animation-delay: .22s; }
+.hearts span:nth-child(3) { animation-delay: .44s; }
+
+@keyframes sea-drift { from { background-position: 3px 7px, 29px 17px, 13px 23px, 47px 39px, 5px 11px; } to { background-position: 81px 50px, -28px 70px, 67px -8px, -26px 108px, 43px 34px; } }
+@keyframes sea-twinkle { from { opacity: .72; } to { opacity: 1; } }
+@keyframes bright-stars { from { opacity: .45; } to { opacity: .95; } }
+@keyframes rays-breathe { from { opacity: .18; } to { opacity: .62; } }
+@keyframes heart-beat { 0%, 100% { transform: scale(.92); opacity: .7; } 45% { transform: scale(1.14); opacity: 1; } }
+
+@media (max-width: 650px) {
+  .star-sea { height: 34%; }
+  .love-card { width: 94vw; }
+  .monogram { font-size: clamp(5rem, 29vw, 8rem); }
+  .love-message { margin-top: 3.2rem; font-size: .68rem; letter-spacing: .17em; padding-left: .17em; white-space: normal; line-height: 1.9; }
+  .hearts { margin-top: 2rem; gap: 1.8rem; font-size: 1.25rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .star-sea, .star-sea::after, .light-rays, .hearts span { animation: none; }
+}
+
+/* Four-scene wedding stage, matching the referenced 16:9 presentation. */
+.wedding-show {
+  position: absolute;
+  inset: 8% 7% 11%;
+  z-index: 6;
+  color: #eef1ff;
+  text-align: center;
+  font-family: var(--font-sans);
+  text-shadow: 0 0 18px rgba(238,241,255,.26), 0 2px 14px #000;
+}
+
+.scene {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  animation: wedding-scene 32s ease-in-out infinite both;
+}
+
+.scene--names { animation-delay: 0s; }
+.scene--date { animation-delay: 8s; }
+.scene--family { animation-delay: 16s; }
+.scene--message { animation-delay: 24s; }
+
+.wedding-monogram {
+  position: relative;
+  width: 1.08em;
+  height: 1.26em;
+  flex-shrink: 0;
+  margin: 0 0 .38em;
+  font-family: var(--font-display);
+  font-size: clamp(6.5rem, 8vw, 10rem);
+  font-style: italic;
+  line-height: 1;
+  color: #f4f3ff;
+}
+
+.wedding-monogram span { position: absolute; }
+.wedding-monogram span:first-child { top: -.12em; left: 0; }
+.wedding-monogram span:last-child { top: .25em; left: .3em; }
+
+.wedding-caption,
+.scene-kicker {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin: 0 0 2.2rem;
+  font-size: clamp(.78rem, 1.3vw, 1.25rem);
+  letter-spacing: .45em;
+  padding-left: .45em;
+  opacity: .86;
+}
+
+.wedding-caption::before,
+.wedding-caption::after,
+.scene-kicker::before,
+.scene-kicker::after {
+  content: "";
+  width: clamp(3rem, 5vw, 6rem);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(230,234,255,.62));
+}
+.wedding-caption::after, .scene-kicker::after { transform: scaleX(-1); }
+
+.couple {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: clamp(1.2rem, 2.1vw, 2.7rem);
+  margin: 0;
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 5vw, 6rem);
+  font-style: italic;
+  line-height: 1.2;
+}
+
+.couple i { position: relative; top: -.25em; font-family: var(--font-display); font-size: .45em; font-weight: 400; opacity: .85; }
+.wedding-date { margin: 2.3rem 0 0; font-size: clamp(.85rem, 1.55vw, 1.45rem); letter-spacing: .12em; opacity: .86; }
+
+.calendar-line { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: clamp(2rem, 5vw, 6rem); }
+.calendar-line span { font-size: clamp(.85rem, 1.7vw, 1.6rem); font-weight: 600; letter-spacing: .35em; padding-left: .35em; white-space: nowrap; }
+.calendar-line strong { font-family: var(--font-sans); font-size: clamp(7rem, 12vw, 12rem); line-height: .82; font-weight: 600; }
+.scene-note { margin: 2rem 0 0; font-size: clamp(.95rem, 1.7vw, 1.6rem); font-style: italic; opacity: .72; }
+
+.family-grid { display: grid; grid-template-columns: 1fr 1fr; width: min(70rem, 85vw); }
+.family-grid > div { padding: 1rem 4vw; }
+.family-grid > div + div { border-left: 1px solid rgba(230,234,255,.3); }
+.family-grid small { display: block; margin-bottom: 1.8rem; font-size: clamp(.75rem, 1.2vw, 1.1rem); letter-spacing: .42em; padding-left: .42em; opacity: .68; }
+.family-grid p { margin: .6rem 0; font-size: clamp(1.15rem, 2.3vw, 2.2rem); font-style: italic; }
+
+.scene-note,
+.family-grid p {
+  font-family: var(--font-display);
+}
+
+.wedding-monogram,
+.couple,
+.couple i {
+  font-family: var(--font-display);
+  font-style: normal;
+  font-weight: 400;
+}
+
+.wedding-caption,
+.wedding-date,
+.scene-kicker,
+.calendar-line span,
+.family-grid small,
+.final-message {
+  font-family: var(--font-sans);
+}
+
+
+.wedding-monogram--small { font-size: clamp(5.5rem, 7vw, 8rem); margin-bottom: .7em; }
+.final-message { max-width: 94%; margin: 0; font-size: clamp(.9rem, 1.55vw, 1.5rem); letter-spacing: .32em; padding-left: .32em; line-height: 1.9; }
+
+.paused *, .paused *::before, .paused *::after { animation-play-state: paused !important; }
+
+@keyframes wedding-scene {
+  0% { opacity: 0; visibility: visible; transform: translateY(14px) scale(.992); filter: blur(5px); }
+  3%, 21% { opacity: 1; visibility: visible; transform: translateY(0) scale(1); filter: blur(0); }
+  25% { opacity: 0; visibility: visible; transform: translateY(-12px) scale(1.005); filter: blur(4px); }
+  25.1%, 100% { opacity: 0; visibility: hidden; }
+}
+
+@media (max-width: 650px) {
+  .wedding-show { inset: 7% 4% 10%; }
+  .wedding-monogram { font-size: clamp(5.2rem, 25vw, 7rem); }
+  .wedding-caption, .scene-kicker { gap: .7rem; margin-bottom: 1.5rem; font-size: .67rem; letter-spacing: .3em; padding-left: .3em; }
+  .wedding-caption::before, .wedding-caption::after, .scene-kicker::before, .scene-kicker::after { width: 2.2rem; }
+  .couple { flex-direction: column; align-items: center; gap: .15rem; font-size: clamp(2.7rem, 13vw, 4.2rem); white-space: normal; }
+  .couple i { top: 0; }
+  .wedding-date { margin-top: 1.5rem; }
+  .calendar-line { gap: .5rem; width: 96vw; }
+  .calendar-line span { display: flex; flex-direction: column; font-size: .68rem; letter-spacing: .18em; padding-left: .18em; }
+  .calendar-line strong { font-size: clamp(5rem, 25vw, 7rem); }
+  .family-grid { grid-template-columns: 1fr; width: 94vw; }
+  .family-grid > div { padding: 1rem; }
+  .family-grid > div + div { border-left: 0; border-top: 1px solid rgba(230,234,255,.3); margin-top: .8rem; padding-top: 1.5rem; }
+  .family-grid small { margin-bottom: .7rem; }
+  .family-grid p { margin: .3rem 0; }
+  .final-message { font-size: .72rem; letter-spacing: .18em; padding-left: .18em; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene { animation: none; }
+  .scene--names { opacity: 1; visibility: visible; }
+}
+
+/* Canvas-led meteor field: random stars, crisp empty center, luminous lower core. */
+.sky::before,
+.sky::after { display: none; }
+
+.star-sea {
+  height: 46%;
+  opacity: 1;
+  background: none;
+  filter: none;
+  animation: none;
+}
+
+.star-sea::after { display: none; }
+
+.star-sea::before {
+  inset: 0;
+  opacity: 1;
+  filter: blur(12px);
+  background:
+    radial-gradient(ellipse at 50% 92%, rgba(220,226,255,.2) 0%, rgba(142,153,207,.1) 24%, transparent 58%),
+    radial-gradient(ellipse at 20% 84%, rgba(109,124,185,.1), transparent 28%),
+    radial-gradient(ellipse at 78% 86%, rgba(111,127,188,.09), transparent 30%);
+}
+
+.star-sea--top {
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 68%, rgba(0,0,0,.88) 84%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 68%, rgba(0,0,0,.88) 84%, transparent 100%);
+}
+
+.star-sea--bottom {
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 68%, rgba(0,0,0,.88) 84%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 68%, rgba(0,0,0,.88) 84%, transparent 100%);
+}
+
+.star-sea--bottom::before {
+  background:
+    radial-gradient(ellipse at 50% 65%, rgba(246,248,255,.78) 0%, rgba(213,220,255,.5) 5%, rgba(152,166,222,.24) 19%, rgba(90,103,163,.1) 37%, transparent 64%),
+    radial-gradient(ellipse at 50% 65%, rgba(255,255,255,.52) 0 1.5%, transparent 2.5%),
+    radial-gradient(ellipse at 18% 78%, rgba(104,119,180,.11), transparent 28%),
+    radial-gradient(ellipse at 81% 80%, rgba(106,121,184,.1), transparent 29%);
+  filter: blur(8px);
+}
+
+.light-rays {
+  inset: 17% 0 12%;
+  opacity: .7;
+  background:
+    linear-gradient(90deg, transparent 11.5%, rgba(224,231,255,.05) 11.72%, rgba(240,244,255,.26) 11.9%, rgba(185,198,251,.04) 12.12%, transparent 12.4%),
+    linear-gradient(90deg, transparent 23.7%, rgba(218,226,255,.04) 23.9%, rgba(244,246,255,.16) 24.06%, transparent 24.32%),
+    linear-gradient(90deg, transparent 39.2%, rgba(213,221,255,.05) 39.42%, rgba(245,247,255,.18) 39.58%, transparent 39.85%),
+    linear-gradient(90deg, transparent 45.55%, rgba(220,226,255,.08) 45.78%, rgba(247,248,255,.34) 46%, rgba(190,202,255,.06) 46.24%, transparent 46.55%),
+    linear-gradient(90deg, transparent 52.1%, rgba(216,224,255,.05) 52.34%, rgba(245,247,255,.2) 52.51%, transparent 52.8%),
+    linear-gradient(90deg, transparent 59.6%, rgba(213,222,255,.05) 59.83%, rgba(245,247,255,.18) 60%, transparent 60.28%),
+    linear-gradient(90deg, transparent 67.8%, rgba(216,224,255,.06) 68.02%, rgba(247,249,255,.27) 68.2%, rgba(188,199,248,.05) 68.42%, transparent 68.7%),
+    linear-gradient(90deg, transparent 76.1%, rgba(216,225,255,.04) 76.32%, rgba(243,246,255,.15) 76.48%, transparent 76.73%),
+    linear-gradient(90deg, transparent 87.1%, rgba(216,225,255,.05) 87.32%, rgba(244,247,255,.2) 87.5%, transparent 87.78%);
+  filter: blur(2.5px);
+  animation: rays-breathe 5.2s ease-in-out infinite alternate;
+}
+
+/* Rays are now drawn procedurally on Canvas for organic width, sway and fading. */
+.light-rays { display: none; }
+
+/* Refined midnight-and-champagne luxury treatment. */
+.sky {
+  background:
+    radial-gradient(ellipse at 50% 74%, rgba(139,112,62,.095), transparent 28%),
+    radial-gradient(ellipse at 50% 20%, rgba(78,87,133,.09), transparent 34%),
+    linear-gradient(180deg, #010207 0%, #050711 47%, #020208 100%);
+}
+
+.nebula {
+  opacity: .38;
+  background:
+    radial-gradient(ellipse at 24% 50%, rgba(184,164,118,.11), transparent 23%),
+    radial-gradient(ellipse at 51% 52%, rgba(233,218,180,.16), transparent 24%),
+    radial-gradient(ellipse at 78% 50%, rgba(132,143,186,.1), transparent 22%);
+}
+
+.star-sea--bottom::before {
+  background:
+    radial-gradient(ellipse at 50% 65%, rgba(255,251,233,.88) 0%, rgba(231,215,174,.56) 5%, rgba(171,151,106,.26) 19%, rgba(97,86,61,.1) 37%, transparent 64%),
+    radial-gradient(ellipse at 50% 65%, rgba(255,255,245,.62) 0 1.5%, transparent 2.5%),
+    radial-gradient(ellipse at 18% 78%, rgba(151,132,89,.09), transparent 28%),
+    radial-gradient(ellipse at 81% 80%, rgba(151,132,89,.09), transparent 29%);
+}
+
+.vignette::before {
+  content: "";
+  position: absolute;
+  inset: 1.3vw;
+  border: 1px solid rgba(214,190,131,.22);
+  box-shadow:
+    inset 0 0 0 4px rgba(3,4,10,.68),
+    inset 0 0 0 5px rgba(214,190,131,.07),
+    0 0 24px rgba(222,198,139,.035);
+  pointer-events: none;
+}
+
+.vignette::after {
+  content: "";
+  position: absolute;
+  inset: calc(1.3vw - 3px);
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 0 0, rgba(248,226,169,.68) 0 1px, transparent 2px),
+    radial-gradient(circle at 100% 0, rgba(248,226,169,.68) 0 1px, transparent 2px),
+    radial-gradient(circle at 0 100%, rgba(248,226,169,.68) 0 1px, transparent 2px),
+    radial-gradient(circle at 100% 100%, rgba(248,226,169,.68) 0 1px, transparent 2px);
+}
+
+/* Keep the edge shading, but remove the decorative frame around the screen. */
+.vignette::before,
+.vignette::after {
+  display: none;
+}
+
+.wedding-show {
+  color: #f7f1e5;
+  text-shadow: 0 0 20px rgba(255,240,204,.12), 0 2px 16px #000;
+}
+
+.wedding-monogram span,
+.couple span {
+  color: transparent;
+  background: linear-gradient(105deg, #b99a55 0%, #f4e5b8 28%, #fffaf0 45%, #d5ba75 63%, #a98542 100%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: drop-shadow(0 2px 8px rgba(223,196,127,.14));
+  animation: champagne-shine 9s ease-in-out infinite;
+}
+
+.wedding-caption,
+.scene-kicker,
+.wedding-date,
+.scene-note,
+.final-message,
+.family-grid small {
+  color: rgba(239,220,172,.88);
+}
+
+.wedding-caption::before,
+.wedding-caption::after,
+.scene-kicker::before,
+.scene-kicker::after {
+  background: linear-gradient(90deg, transparent, rgba(226,199,133,.66));
+}
+
+.couple i,
+.calendar-line strong,
+.family-grid p {
+  color: #f8f2e7;
+  text-shadow: 0 0 24px rgba(226,199,133,.12);
+}
+
+.family-grid > div + div { border-color: rgba(220,195,133,.25); }
+.hearts { color: #e4c987; }
+
+.sound-toggle {
+  border-color: rgba(218,192,129,.28);
+  background: rgba(7,7,12,.48);
+}
+.sound-toggle span { background: rgba(233,211,157,.78); }
+
+@keyframes champagne-shine {
+  0%, 28% { background-position: 100% 50%; }
+  62%, 100% { background-position: 0% 50%; }
+}
+
+/* White diamond luxury: luminous, ceremonial, and projector-friendly. */
+.sky {
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(123,143,205,.055), transparent 40%),
+    radial-gradient(ellipse at 50% 73%, rgba(221,229,255,.12), transparent 29%),
+    radial-gradient(ellipse at 50% 19%, rgba(164,180,228,.1), transparent 35%),
+    linear-gradient(180deg, #010208 0%, #050713 47%, #010208 100%);
+}
+
+.nebula {
+  opacity: .54;
+  background:
+    radial-gradient(ellipse at 22% 50%, rgba(190,205,255,.12), transparent 25%),
+    radial-gradient(ellipse at 50% 52%, rgba(246,249,255,.24), transparent 25%),
+    radial-gradient(ellipse at 79% 50%, rgba(188,203,255,.12), transparent 25%);
+}
+
+.star-sea--bottom::before {
+  background:
+    radial-gradient(ellipse at 50% 65%, rgba(255,255,255,.98) 0%, rgba(232,239,255,.68) 5%, rgba(178,193,242,.32) 19%, rgba(94,108,162,.12) 39%, transparent 66%),
+    radial-gradient(ellipse at 50% 65%, rgba(255,255,255,.78) 0 1.7%, transparent 2.8%),
+    radial-gradient(ellipse at 18% 78%, rgba(176,190,238,.12), transparent 30%),
+    radial-gradient(ellipse at 81% 80%, rgba(176,190,238,.12), transparent 30%);
+  filter: blur(7px);
+}
+
+.vignette::before {
+  border-color: rgba(236,242,255,.34);
+  box-shadow:
+    inset 0 0 0 4px rgba(3,4,10,.68),
+    inset 0 0 0 5px rgba(236,242,255,.11),
+    0 0 28px rgba(220,231,255,.06);
+}
+
+.vignette::after {
+  background:
+    radial-gradient(circle at 0 0, rgba(255,255,255,.95) 0 1.2px, rgba(211,224,255,.4) 1.5px, transparent 3px),
+    radial-gradient(circle at 100% 0, rgba(255,255,255,.95) 0 1.2px, rgba(211,224,255,.4) 1.5px, transparent 3px),
+    radial-gradient(circle at 0 100%, rgba(255,255,255,.95) 0 1.2px, rgba(211,224,255,.4) 1.5px, transparent 3px),
+    radial-gradient(circle at 100% 100%, rgba(255,255,255,.95) 0 1.2px, rgba(211,224,255,.4) 1.5px, transparent 3px);
+}
+
+.wedding-show {
+  color: #fbfcff;
+  text-shadow: 0 0 18px rgba(228,236,255,.22), 0 0 42px rgba(180,198,255,.08), 0 2px 16px #000;
+}
+
+.wedding-monogram span,
+.couple span {
+  background: linear-gradient(105deg, #b8c2d8 0%, #eef3ff 24%, #ffffff 43%, #dce5f8 61%, #ffffff 78%, #aebbd4 100%);
+  background-size: 240% 100%;
+  filter: drop-shadow(0 0 8px rgba(232,239,255,.26)) drop-shadow(0 2px 12px rgba(155,174,224,.13));
+  animation-name: diamond-shine;
+  animation-duration: 7.5s;
+}
+
+.wedding-caption,
+.scene-kicker,
+.wedding-date,
+.scene-note,
+.final-message,
+.family-grid small {
+  color: rgba(239,244,255,.92);
+}
+
+.wedding-caption::before,
+.wedding-caption::after,
+.scene-kicker::before,
+.scene-kicker::after {
+  background: linear-gradient(90deg, transparent, rgba(239,245,255,.8));
+  box-shadow: 0 0 6px rgba(221,233,255,.2);
+}
+
+.couple i,
+.calendar-line strong,
+.family-grid p {
+  color: #ffffff;
+  text-shadow: 0 0 22px rgba(229,237,255,.22), 0 0 52px rgba(171,189,235,.08);
+}
+
+.family-grid > div + div { border-color: rgba(231,239,255,.28); }
+.hearts { color: #fff; filter: drop-shadow(0 0 8px rgba(220,231,255,.38)); }
+.sound-toggle { border-color: rgba(231,239,255,.34); background: rgba(7,8,15,.5); }
+.sound-toggle span { background: rgba(245,248,255,.88); }
+
+@keyframes diamond-shine {
+  0%, 24% { background-position: 110% 50%; }
+  58%, 100% { background-position: -10% 50%; }
+}
+
+.vignette {
+  box-shadow: inset 0 0 13vw 3vw rgba(0, 0, 9, .48);
+}
+
+/* Two flattened spiral galaxies: bright cores, soft dust halos, slow orbital motion. */
+.star-sea::before,
+.star-sea--bottom::before {
+  inset: 0;
+  opacity: 1;
+  background:
+    radial-gradient(ellipse 7% 10% at 50% 43.5%, rgba(255,253,243,1) 0%, rgba(255,239,207,.8) 38%, transparent 100%),
+    radial-gradient(ellipse 28% 21% at 50% 43.5%, rgba(241,247,255,.7) 0%, rgba(177,199,245,.31) 52%, transparent 100%),
+    radial-gradient(ellipse 72% 42% at 50% 43.5%, rgba(172,198,244,.3) 0%, rgba(91,116,178,.14) 56%, transparent 84%),
+    radial-gradient(ellipse 96% 66% at 50% 43.5%, rgba(118,149,214,.12), transparent 76%);
+  filter: blur(3.5px) brightness(1.28);
+  will-change: opacity;
+  animation: galaxy-core-breathe 6.5s ease-in-out infinite alternate;
+}
+
+.star-sea--bottom::before {
+  background:
+    radial-gradient(ellipse 7% 10% at 50% 43.5%, rgba(255,253,243,1) 0%, rgba(255,239,207,.8) 38%, transparent 100%),
+    radial-gradient(ellipse 28% 21% at 50% 43.5%, rgba(241,247,255,.7) 0%, rgba(177,199,245,.31) 52%, transparent 100%),
+    radial-gradient(ellipse 72% 42% at 50% 43.5%, rgba(172,198,244,.3) 0%, rgba(91,116,178,.14) 56%, transparent 84%),
+    radial-gradient(ellipse 96% 66% at 50% 43.5%, rgba(118,149,214,.12), transparent 76%);
+}
+
+@keyframes galaxy-core-breathe {
+  from { opacity: .92; }
+  to { opacity: 1; }
+}
+
+.star-sea::after,
+.star-sea--bottom::after {
+  display: none;
+}
+
+/* Render the couple names as plain text; remove the obsolete GH monogram. */
+.wedding-monogram {
+  display: none !important;
+}
+
+.couple span {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  background: none !important;
+  background-image: none !important;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
+  filter: none !important;
+  animation: none !important;
+  text-shadow: 0 0 18px rgba(226,236,255,.24), 0 2px 14px rgba(0,0,0,.85);
+}
+
+.family-grid p {
+  font-family: var(--font-sans);
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: .01em;
+}
+
+/* A single jeweled star and fine rules replace the three casual hearts. */
+.hearts {
+  width: min(24rem, 58vw);
+  margin: clamp(2rem, 4vh, 3.25rem) auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(.8rem, 1.8vw, 1.35rem);
+  color: #f9fbff;
+  filter: none;
+}
+
+.hearts::before,
+.hearts::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(230,239,255,.68));
+  box-shadow: 0 0 8px rgba(199,217,255,.16);
+}
+
+.hearts::after { transform: scaleX(-1); }
+
+.hearts span {
+  font-family: var(--font-sans);
+  font-size: clamp(.85rem, 1.4vw, 1.15rem);
+  line-height: 1;
+  color: #ffffff;
+  filter: drop-shadow(0 0 5px rgba(235,243,255,.78)) drop-shadow(0 0 14px rgba(178,202,255,.38));
+  animation: jewel-sparkle 2.8s ease-in-out infinite;
+}
+
+@keyframes jewel-sparkle {
+  0%, 100% { opacity: .62; transform: scale(.82) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.12) rotate(45deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hearts span { animation: none; }
+}
+
+.hint,
+.sound-toggle {
+  display: none !important;
+}
